@@ -1155,9 +1155,10 @@ function validateArchive(bytes, expectedNames){
   } catch (err){
     throw new Error("VALIDATION FAILED — the generated archive is not a readable ZIP (" + err.message + ").");
   }
-  const names = entries.map(e => e.name);
   for (const n of expectedNames){
-    if (!names.includes(n)) throw new Error("VALIDATION FAILED — " + n + " is missing from the generated archive.");
+    const entry = entries.find(e => e.name === n);
+    if (!entry) throw new Error("VALIDATION FAILED — " + n + " is missing from the generated archive.");
+    if (entry.uncompSize === 0) throw new Error("VALIDATION FAILED — " + n + " was packaged with a reported size of 0 bytes.");
   }
   return true;
 }
@@ -1169,12 +1170,15 @@ function generateMcaddon(){
   }
   if (!state.resBytes) throw new Error("No Resource Pack loaded — cannot generate .mcaddon.");
 
-  const behEntry = { name: "Crusaders_Custom_Behaviour.mcpack", data: state.builtBehaviourBytes };
-  const resEntry = { name: "Crusaders_Custom_Resource.mcpack", data: state.resBytes };
+  const behEntry = { name: "Crusaders_Custom_Behaviour.mcpack", method: 0, data: state.builtBehaviourBytes, crc: crc32(state.builtBehaviourBytes), uncompSize: state.builtBehaviourBytes.length };
+  const resEntry = { name: "Crusaders_Custom_Resource.mcpack", method: 0, data: state.resBytes, crc: crc32(state.resBytes), uncompSize: state.resBytes.length };
   const mcaddonBytes = writeZip([behEntry, resEntry]);
 
   logLine2("VALIDATING...", "busy");
   validateArchive(mcaddonBytes, ["Crusaders_Custom_Behaviour.mcpack", "Crusaders_Custom_Resource.mcpack"]);
+  if (behEntry.uncompSize === 0 || resEntry.uncompSize === 0){
+    throw new Error("VALIDATION FAILED — a packaged .mcpack reported 0 bytes.");
+  }
 
   const versionLabel = state.behVersion !== null ? String(state.behVersion) : "Custom";
   const filename = "CrusadersBedrock(" + versionLabel + ").mcaddon";
