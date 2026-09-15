@@ -1,0 +1,955 @@
+WEBSITE STYLE SYSTEM
+
+Create the website using this exact visual direction:
+
+1. OVERALL STYLE
+Style:
+- Dark-first editorial dashboard
+- Game/mod documentation aesthetic
+- Soft brutalism
+- Minimal, clean, technical UI
+- Slightly mysterious / premium feeling
+- Rounded cards and controls
+- Thin borders
+- Very subtle shadows
+- Lots of breathing room
+- Strong typography hierarchy
+- Small micro-interactions instead of flashy animations
+The website should feel like:
+"Technical documentation + game control panel + modern editorial website"
+
+Avoid:(what i dont like soo much ill code then later..)
+- Neon cyberpunk
+- Excessive gradients
+- Glassmorphism
+- Huge glowing effects
+- Excessive animations
+- Generic AI-looking UI
+- Excessive rounded bubble elements
+---
+
+2. COLOUR PALETTE
+
+DARK MODE
+
+Background:
+#0D0B0E
+
+Primary panel:
+#151116
+
+Secondary panel:
+#1B161C
+
+Elevated panel:
+#211B21
+
+Borders:
+#332B33
+
+Subtle borders:
+#282229
+
+Primary text:
+#F1E9DE
+
+Secondary text:
+#B8AFB5
+
+Muted text:
+#817780
+
+Accent:
+#D97832
+
+Accent hover:
+#EA8B3F
+
+Accent dark:
+#A95822
+
+Success:
+#7FAF75
+
+Warning:
+#D49A45
+
+Danger:
+#C85C5C
+
+LIGHT MODE
+
+Background:
+#F5F1EB
+
+Primary panel:
+#FFFFFF
+
+Secondary panel:
+#F0EBE5
+
+Elevated panel:
+#E9E2DA
+
+Borders:
+#D9D0C7
+
+Primary text:
+#292429
+
+Secondary text:
+#625A60
+
+Muted text:
+#8B8287
+
+Accent:
+#C86628
+
+Accent hover:
+#AF5420
+
+Success:
+#638B5C
+
+Warning:
+#B47B32
+
+Danger:
+#B94D4D
+
+3. FONTS
+
+UI / Main font:
+"Space Grotesk"
+
+Use for:
+
+- Navigation
+- Buttons
+- Labels
+- Cards
+- Statistics
+- Controls
+- UI text
+
+Technical / Code font:
+"IBM Plex Mono"
+
+Use for:
+
+- Commands
+- Code
+- Configuration
+- Version numbers
+- Technical values
+- IDs
+- Small technical labels
+
+Editorial / Heading font:
+"Computer Modern Serif"
+
+Use for:
+
+- Large headings
+- Hero descriptions
+- Editorial-style text
+- Important section introductions
+
+Font hierarchy:
+
+Large heading:
+Computer Modern Serif
+
+UI heading:
+Space Grotesk
+
+Body:
+Space Grotesk
+
+Code:
+IBM Plex Mono
+
+4. TYPOGRAPHY
+
+Large hero heading:
+
+- Serif
+- Large
+- Strong contrast
+- Tight line-height
+- Slightly editorial
+
+Section heading:
+
+- Space Grotesk
+- Bold
+- Medium/large size
+
+Body:
+
+- Comfortable line height
+- Muted colour
+- Avoid pure white
+
+Technical text:
+
+- IBM Plex Mono
+- Smaller
+- High readability
+
+Small labels:
+
+- Uppercase
+- Letter spacing around 0.08em to 0.12em
+- Muted colour
+
+5. CARDS
+
+Cards should use:
+
+background:
+#151116
+
+border:
+1px solid #332B33
+
+border-radius:
+16px
+
+padding:
+20px to 24px
+
+shadow:
+very subtle
+
+Example:
+
+.card {
+background: #151116;
+border: 1px solid #332B33;
+border-radius: 16px;
+padding: 22px;
+transition:
+transform 160ms ease,
+border-color 160ms ease,
+background 160ms ease;
+}
+
+.card:hover {
+transform: translateY(-2px);
+border-color: #4A3D49;
+}
+
+6. BUTTONS
+
+Buttons should be compact and tactile.
+
+Primary button:
+
+- Accent background
+- Dark text
+- Rounded pill
+- Slight hover movement
+
+Secondary button:
+
+- Transparent / panel background
+- Thin border
+- Light text
+
+Example:
+
+.primary-button {
+background: #D97832;
+color: #160F0B;
+border: 0;
+border-radius: 999px;
+padding: 11px 17px;
+font-family: "Space Grotesk";
+font-weight: 700;
+cursor: pointer;
+transition: 160ms ease;
+}
+
+.primary-button:hover {
+background: #EA8B3F;
+transform: translateY(-1px);
+}
+
+.secondary-button {
+background: #151116;
+color: #F1E9DE;
+border: 1px solid #332B33;
+border-radius: 999px;
+}
+
+7. PILLS
+
+Use pill-shaped elements for:
+
+- Versions
+- Status
+- Statistics
+- Tags
+- Categories
+- Small controls
+
+Example:
+
+.pill {
+display: inline-flex;
+align-items: center;
+gap: 7px;
+
+padding: 7px 11px;
+
+border-radius: 999px;
+
+background: #1B161C;
+border: 1px solid #332B33;
+
+color: #B8AFB5;
+
+font-family: "IBM Plex Mono";
+font-size: 12px;
+
+}
+
+8. SIDEBAR
+
+Desktop:
+
+- Fixed/anchored navigation
+- Dark panel
+- Thin border
+- Compact navigation
+
+Mobile:
+
+- Hidden by default
+- Opens as a sliding drawer
+- Background overlay behind it
+
+Sidebar style:
+
+background:
+#151116
+
+border:
+1px solid #332B33
+
+Navigation items:
+
+- Rounded
+- Muted normally
+- Accent when active
+
+Active item:
+background:
+#211B21
+
+text:
+#F1E9DE
+
+accent indicator:
+#D97832
+
+9. COLLAPSIBLE MENUS
+
+Use expandable navigation groups.
+
+Example groups:
+
+FEATURES
+TOGGLES
+COMMANDS
+
+Each group has:
+
+[ Group name ]       ˅
+
+Clicking it expands the submenu.
+
+Chevron:
+
+- Rotates approximately 90°/180°
+- Smooth transition
+
+Submenu:
+
+- Smaller text
+- Slight indentation
+- Muted colour
+
+10. TOP NAVIGATION
+
+Keep navigation minimal.
+
+Desktop:
+Logo / title on left
+Navigation links in center/right
+
+Mobile:
+Hamburger button
+
+Hamburger button:
+
+- Circular or rounded square
+- Dark panel
+- Thin border
+- Small icon
+
+When opened:
+hamburger → X
+
+11. THEME SWITCH
+
+Use a Dark / Light switch.
+
+Dark mode:
+Moon icon
+
+Light mode:
+Sun icon
+
+Switch should:
+
+- Change the CSS variables
+- Change icon
+- Play a subtle UI sound
+- Remember the user's selection using localStorage
+
+12. SOUND UI
+
+Use subtle Web Audio API generated sounds.
+
+Do NOT use loud sound effects.
+
+Suggested sound types:
+
+Navigation:
+short soft tone
+
+Toggle:
+small click
+
+Slider:
+very short tick
+
+Spawn/action:
+slightly deeper confirmation tone
+
+Theme change:
+soft two-tone transition
+
+Sound should feel like:
+"physical interface feedback"
+
+Not:
+"arcade game sound"
+
+13. MICRO-INTERACTIONS
+
+Use small interactions everywhere.
+
+Buttons:
+
+- Slight lift
+- Background change
+
+Cards:
+
+- Slight upward movement
+
+Toggles:
+
+- Smooth switch movement
+
+Chevrons:
+
+- Rotate
+
+Copy button:
+Copy icon → Check icon temporarily
+
+Sidebar:
+Slide in/out
+
+Theme:
+Smooth colour transition
+
+Navigation:
+Active section changes automatically
+
+Keep animations around:
+150ms–250ms
+
+Use:
+ease
+ease-out
+
+14. TOGGLES
+
+Toggle design:
+
+Off:
+dark/neutral
+
+On:
+accent orange
+
+Rounded track:
+999px
+
+Circular thumb:
+small
+
+Example:
+
+.toggle {
+width: 44px;
+height: 24px;
+border-radius: 999px;
+border: 1px solid #332B33;
+background: #211B21;
+}
+
+.toggle.active {
+background: #D97832;
+}
+
+.toggle-thumb {
+width: 18px;
+height: 18px;
+border-radius: 50%;
+transition: transform 160ms ease;
+}
+
+15. SLIDERS
+
+Use thin technical sliders.
+
+Track:
+dark muted panel
+
+Active portion:
+accent orange
+
+Thumb:
+small circular control
+
+Values should appear beside/below the slider using IBM Plex Mono.
+
+Example:
+
+HUNT RADIUS
+
+[────────●──────] 32
+
+The number should update live.
+
+16. CODE / COMMAND BLOCKS
+
+Code areas should look technical.
+
+Background:
+#100D11
+
+Border:
+#332B33
+
+Font:
+IBM Plex Mono
+
+Text:
+#D7CED4
+
+Accent:
+#D97832
+
+Use:
+
+- Copy button
+- Small command label
+- Monospace formatting
+
+Example layout:
+
+COMMAND
+
+/spawn hunter
+
+                [ COPY ]
+
+17. ICONS
+
+Use simple SVG icons.
+
+Style:
+
+- Line icons
+- Minimal
+- Consistent stroke width
+- Rounded joins
+
+Avoid:
+
+- Huge detailed icons
+- Emoji as primary UI icons
+- Random icon styles
+
+Use icons for:
+
+- Menu
+- Close
+- Moon
+- Sun
+- Volume
+- Copy
+- Check
+- Chevron
+- Settings
+- Navigation
+- Commands
+- Features
+
+18. SECTION DIVIDERS
+
+Use very subtle separators.
+
+Examples:
+
+────────────────────────
+
+or
+
+thin border + small accent element
+
+You can also use an abstract stripe/stripe pattern as a visual break between major sections.
+
+Keep it subtle.
+
+19. RESPONSIVE DESIGN
+
+Mobile-first.
+
+Desktop:
+
+- Two-column feature grids
+- Sidebar/navigation
+- Wider content area
+
+Mobile:
+
+- One-column cards
+- Sliding sidebar
+- Fixed bottom navigation
+- Larger touch targets
+- Reduced heading size
+
+Use approximately:
+
+@media (min-width: 800px)
+
+for major layout changes.
+
+20. MOBILE BOTTOM NAVIGATION
+
+On mobile, use a fixed bottom navigation bar.
+
+Example:
+
+HOME     FEATURES     SETTINGS     COMMANDS
+
+Style:
+
+background:
+#151116
+
+border-top:
+1px solid #332B33
+
+Each item:
+
+- Small icon
+- Small label
+- Active accent
+
+On desktop:
+convert it into normal navigation or hide it.
+
+21. FIXED SOUND BUTTON
+
+Place a small floating sound button near the bottom-right.
+
+Shape:
+circular
+
+Background:
+#151116
+
+Border:
+1px solid #332B33
+
+Icon:
+speaker
+
+When enabled:
+accent icon
+
+When disabled:
+muted icon
+
+22. HERO SECTION
+
+Hero should have:
+
+Small technical label:
+"ARCHIVE / SYSTEM / v1.0"
+
+Large serif title
+
+Short muted description
+
+Primary CTA
+
+Secondary CTA
+
+Small statistic pills
+
+Example structure:
+
+[ v1.0.19 ]
+
+HUNTER AI
+
+Autonomous behaviour,
+combat logic and survival systems.
+
+[ SPAWN ] [ DOCUMENTATION ]
+
+[ 24 FEATURES ] [ 12 TOGGLES ]
+
+23. GENERAL SPACING
+
+Use generous spacing.
+
+Page padding:
+16px mobile
+24px tablet
+32px+ desktop
+
+Card gap:
+14px–20px
+
+Section spacing:
+60px–100px
+
+Do not cram everything together.
+
+24. BORDER RADIUS
+
+Main cards:
+14–18px
+
+Buttons:
+999px
+
+Pills:
+999px
+
+Inputs:
+10–14px
+
+Sidebar items:
+10–12px
+
+Avoid making every element extremely rounded.
+
+25. SHADOWS
+
+Keep shadows extremely subtle.
+
+Prefer borders over shadows.
+
+Example:
+
+box-shadow:
+0 8px 30px rgba(0,0,0,.12);
+
+Do NOT use:
+huge glowing shadows
+neon glows
+strong drop shadows
+
+26. ANIMATION PHILOSOPHY
+
+Animations should communicate state.
+
+Good:
+
+- sidebar sliding
+- menu expanding
+- button pressing
+- toggle switching
+- icon changing
+- active navigation
+- theme transition
+- copy confirmation
+
+Avoid:
+
+- constant floating
+- excessive particles
+- spinning everything
+- huge entrance animations
+
+27. INTERACTION PHILOSOPHY
+
+Every control should visibly respond.
+
+Examples:
+
+CLICK MENU
+→ sidebar slides in
+→ hamburger becomes X
+→ overlay appears
+
+CLICK TOGGLE
+→ switch moves
+→ colour changes
+→ value updates
+→ subtle sound
+
+CLICK COPY
+→ clipboard copies
+→ icon becomes ✓
+→ returns after ~1 second
+
+CHANGE SLIDER
+→ value updates immediately
+
+SCROLL
+→ active navigation section updates
+
+CHANGE THEME
+→ entire colour system changes smoothly
+
+ENABLE SOUND
+→ UI sounds become active
+
+28. DESIGN KEYWORDS
+
+Use these keywords when describing the style to another AI:
+
+"dark editorial dashboard"
+
+"soft brutalist UI"
+
+"technical documentation interface"
+
+"game mod control panel"
+
+"warm dark plum palette"
+
+"orange accent"
+
+"Space Grotesk"
+
+"IBM Plex Mono"
+
+"Computer Modern Serif"
+
+"thin borders"
+
+"rounded cards"
+
+"subtle micro-interactions"
+
+"minimal shadows"
+
+"responsive mobile-first"
+
+"SVG line icons"
+
+"technical configuration panels"
+
+"interactive documentation"
+
+"premium but understated"
+
+"no neon cyberpunk"
+
+"no excessive gradients"
+
+"no glassmorphism"
+
+29. CORE CSS VARIABLES
+
+Use this as the starting point:
+
+:root {
+--bg: #0D0B0E;
+--panel: #151116;
+--panel-2: #1B161C;
+--panel-3: #211B21;
+
+--border: #332B33;
+--border-soft: #282229;
+
+--text: #F1E9DE;
+--text-2: #B8AFB5;
+--muted: #817780;
+
+--accent: #D97832;
+--accent-hover: #EA8B3F;
+--accent-dark: #A95822;
+
+--success: #7FAF75;
+--warning: #D49A45;
+--danger: #C85C5C;
+
+--radius: 16px;
+--pill: 999px;
+
+--transition: 180ms ease;
+
+}
+
+.light {
+--bg: #F5F1EB;
+--panel: #FFFFFF;
+--panel-2: #F0EBE5;
+--panel-3: #E9E2DA;
+
+--border: #D9D0C7;
+--border-soft: #E5DED6;
+
+--text: #292429;
+--text-2: #625A60;
+--muted: #8B8287;
+
+--accent: #C86628;
+--accent-hover: #AF5420;
+--accent-dark: #934318;
+
+}
+
+30. FINAL VISUAL RULE
+
+The most important rule:
+
+Make the interface feel like a real tool made by a developer/designer, not an AI-generated landing page.
+
+Prioritize:
+
+1. Typography
+2. Spacing
+3. Borders
+4. Information hierarchy
+5. Small interactions
+6. Consistent icons
+7. Functional controls
+
+The interface should look calm, technical, tactile and slightly editorial.
