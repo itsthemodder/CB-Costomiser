@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crusaders Bedrock Customizer</title>
+<style>
+:root{
+  --bg:#0D0B0E; --panel:#151116; --panel2:#1B161C; --panel3:#211B21;
+  --border:#332B33; --text:#F1E9DE; --text2:#B8AFB5; --muted:#817780;
+  --accent:#D97832; --accent-h:#EA8B3F; --success:#7FAF75; --warning:#D49A45; --danger:#C85C5C;
+  --radius:16px; --shadow:0 6px 20px rgba(0,0,0,.35);
+  --font-ui:'Space Grotesk','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','SFMono-Regular',Consolas,'Liberation Mono',monospace;
+  --font-serif:'Computer Modern Serif',Georgia,'Times New Roman',serif;
+  color-scheme: dark;
+}
+html[data-theme="light"]{
+  --bg:#F5F0E8; --panel:#FFFFFF; --panel2:#F1EAE0; --panel3:#EBE2D4;
+  --border:#DBD0BE; --text:#241C1E; --text2:#5A4E4F; --muted:#8A7C7A;
+  --accent:#C96A28; --accent-h:#B85E20; --success:#4C7A43; --warning:#A9762A; --danger:#A5433C;
+  color-scheme: light;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased; min-height:100vh; line-height:1.5;
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+a{color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+.skip-link{position:absolute;left:-9999px;top:0;background:var(--accent);color:#1a1414;padding:10px 16px;z-index:200;border-radius:0 0 8px 0;}
+.skip-link:focus{left:0;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* ---- layout shell ---- */
+.shell{display:flex;min-height:100vh;}
+.sidebar{
+  width:250px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);
+  padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar-brand{font-family:var(--font-serif);font-size:19px;padding:6px 10px 18px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.sidebar-brand small{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-top:4px;}
+.nav-section{margin-bottom:18px;}
+.nav-section h3{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 6px 10px;font-weight:500;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;background:transparent;
+  color:var(--text2);border-radius:10px;font-size:14px;text-align:left;transition:background .18s,color .18s;position:relative;
+}
+.nav-item svg{flex-shrink:0;width:16px;height:16px;}
+.nav-item:hover{background:var(--panel2);color:var(--text);}
+.nav-item.active{background:var(--panel2);color:var(--text);}
+.nav-item.active::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;background:var(--accent);border-radius:2px;}
+
+.main-col{flex:1;min-width:0;}
+.topbar{
+  position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
+  padding:12px 24px;background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.hamburger{display:none;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:8px;color:var(--text);}
+.topbar-title{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.topbar-spacer{flex:1;}
+.status-pill{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;
+  padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--panel2);color:var(--text2);
+}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+.status-pill.online .status-dot{background:var(--success);}
+.status-pill.offline .status-dot{background:var(--danger);}
+.icon-btn{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:8px;color:var(--text2);display:inline-flex;transition:background .18s,color .18s;}
+.icon-btn:hover{background:var(--panel3);color:var(--text);}
+.icon-btn svg{width:16px;height:16px;}
+
+.content{padding:24px;max-width:1180px;margin:0 auto;padding-bottom:96px;}
+@media(min-width:801px){.content{padding:32px;}}
+
+/* ---- hero ---- */
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;}
+.hero{padding:28px 0 32px;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.hero h1{font-family:var(--font-serif);font-weight:400;font-size:clamp(30px,5vw,50px);line-height:1.08;margin:10px 0 14px;}
+.hero p{color:var(--text2);max-width:56ch;font-size:15px;margin:0 0 20px;}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+.btn{
+  border-radius:999px;border:1px solid transparent;padding:11px 20px;font-weight:600;font-size:14px;
+  display:inline-flex;align-items:center;gap:8px;transition:transform .15s,background .18s,border-color .18s;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--accent);color:#1a1310;}
+.btn-primary:hover{background:var(--accent-h);}
+.btn-secondary{background:var(--panel2);color:var(--text);border-color:var(--border);}
+.btn-secondary:hover{background:var(--panel3);}
+.btn-danger{background:transparent;color:var(--danger);border-color:var(--danger);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;}
+.stat-box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+.stat-box .num{font-family:var(--font-mono);font-size:22px;color:var(--accent);}
+.stat-box .lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ---- cards / grid ---- */
+.grid{display:grid;gap:18px;}
+.grid-2{grid-template-columns:1fr;}
+@media(min-width:900px){.grid-2{grid-template-columns:1fr 1fr;}}
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);transition:transform .18s,border-color .18s;
+}
+.card:hover{border-color:color-mix(in srgb, var(--border) 60%, var(--accent));}
+.card h2{font-size:16px;margin:0 0 4px;font-weight:600;}
+.card .sub{color:var(--muted);font-size:12.5px;font-family:var(--font-mono);margin-bottom:16px;}
+.section-gap{margin-bottom:24px;}
+.pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--border);background:var(--panel2);color:var(--text2);}
+.pill.accent{color:var(--accent);border-color:color-mix(in srgb, var(--accent) 40%, var(--border));}
+.pill.ok{color:var(--success);}
+.pill.warn{color:var(--warning);}
+.pill.bad{color:var(--danger);}
+.pack-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.pack-row:last-child{border-bottom:none;}
+.pack-row .name{font-family:var(--font-mono);font-size:12.5px;color:var(--text2);word-break:break-all;}
+.source-toggle{display:flex;gap:8px;margin-bottom:14px;}
+.source-toggle button{flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text2);font-size:13px;font-weight:600;}
+.source-toggle button.active{background:color-mix(in srgb, var(--accent) 18%, var(--panel2));color:var(--accent);border-color:var(--accent);}
+.upload-row{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.upload-row label{font-size:12.5px;color:var(--text2);}
+.upload-row input[type=file]{font-size:12.5px;color:var(--text2);width:100%;}
+
+/* ---- feature cards ---- */
+.feature-group{margin-bottom:22px;}
+.feature-group h3{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;}
+.feature-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 18px;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:10px;
+}
+.feature-info .fname{font-weight:600;font-size:14.5px;}
+.feature-info .ffile{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-top:2px;}
+.feature-info .fdesc{font-size:13px;color:var(--text2);margin-top:6px;max-width:52ch;}
+.toggle{
+  --w:50px;--h:28px;width:var(--w);height:var(--h);border-radius:999px;background:var(--panel3);
+  border:1px solid var(--border);position:relative;flex-shrink:0;transition:background .2s,border-color .2s;
+}
+.toggle .knob{
+  position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--muted);
+  transition:transform .2s,background .2s;
+}
+.toggle[aria-pressed="true"]{background:color-mix(in srgb, var(--success) 30%, var(--panel3));border-color:var(--success);}
+.toggle[aria-pressed="true"] .knob{transform:translateX(22px);background:var(--success);}
+.toggle[aria-pressed="false"] .knob{background:var(--danger);}
+.toggle-lbl{font-family:var(--font-mono);font-size:10.5px;text-align:center;margin-top:6px;color:var(--muted);}
+
+/* ---- code preview ---- */
+.code-block{
+  background:#0A0809;border:1px solid var(--border);border-radius:12px;padding:16px;overflow:auto;
+  max-height:420px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:#E7DED2;
+}
+html[data-theme="light"] .code-block{background:#20191A;color:#EEE5D8;}
+.code-block .ln-off{color:#7a6f77;}
+.code-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;}
+.diff-list{list-style:none;margin:10px 0 0;padding:0;font-family:var(--font-mono);font-size:12.5px;}
+.diff-list li{padding:6px 0;border-bottom:1px solid var(--border);color:var(--text2);}
+.diff-list li:last-child{border-bottom:none;}
+
+/* ---- debug panel ---- */
+.debug-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12.5px;}
+.debug-table td{padding:7px 4px;border-bottom:1px solid var(--border);vertical-align:top;}
+.debug-table td:first-child{color:var(--muted);width:46%;}
+.debug-table tr:last-child td{border-bottom:none;}
+
+/* ---- log / status ---- */
+.log-line{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12.5px;color:var(--text2);padding:4px 0;}
+.log-line .spin{width:11px;height:11px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.log-line.err{color:var(--danger);}
+.log-line.ok{color:var(--success);}
+
+footer{padding:28px 24px 100px;color:var(--muted);font-size:12px;font-family:var(--font-mono);text-align:center;}
+@media(min-width:801px){footer{padding-bottom:40px;}}
+
+/* ---- mobile ---- */
+.sidebar{display:none;}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;}
+.drawer-overlay.open{display:block;}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:78vw;max-width:290px;background:var(--panel);
+  border-right:1px solid var(--border);z-index:70;transform:translateX(-100%);transition:transform .22s ease;
+  padding:18px 14px;overflow-y:auto;
+}
+.drawer.open{transform:translateX(0);}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.bottom-nav{
+  display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--panel);
+  border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+}
+.bottom-nav button{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;
+  color:var(--muted);font-size:10.5px;padding:6px 2px;border-radius:10px;font-family:var(--font-ui);
+}
+.bottom-nav button svg{width:18px;height:18px;}
+.bottom-nav button.active{color:var(--accent);}
+
+@media(max-width:800px){
+  .sidebar{display:none!important;}
+  .hamburger{display:inline-flex;}
+  .content{padding:16px;padding-bottom:88px;}
+  footer{padding-bottom:88px;}
+  .feature-card{flex-direction:column;align-items:flex-start;}
+  .toggle-wrap{align-self:flex-end;}
+}
+@media(min-width:801px){
+  .sidebar{display:block;}
+  .bottom-nav{display:none;}
+  .hamburger{display:none;}
+}
+.sound-fab{
+  position:fixed;right:16px;bottom:80px;z-index:55;background:var(--panel2);border:1px solid var(--border);
+  border-radius:999px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;color:var(--text2);
+}
+@media(min-width:801px){.sound-fab{bottom:20px;}}
+[hidden]{display:none!important;}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="shell">
+  <!-- Desktop sidebar -->
+  <nav class="sidebar" aria-label="Primary">
+    <div class="sidebar-brand">Crusaders Bedrock<small>Customizer / Archive</small></div>
+    <div class="nav-section">
+      <h3>Navigate</h3>
+      <button class="nav-item" data-nav="home" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+        Home
+      </button>
+      <button class="nav-item" data-nav="features">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Features
+      </button>
+      <button class="nav-item" data-nav="toggles">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="5"/><circle cx="8" cy="12" r="3"/></svg>
+        Toggles
+      </button>
+      <button class="nav-item" data-nav="commands">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Commands
+      </button>
+      <button class="nav-item" data-nav="advanced">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>
+        Advanced
+      </button>
+    </div>
+    <div class="nav-section">
+      <h3>Base Packs</h3>
+      <div id="sidebar-versions" style="padding:0 10px;font-family:var(--font-mono);font-size:12px;color:var(--text2);">
+        <div>BEH <span id="sv-beh" class="pill accent" style="margin-left:4px;">--</span></div>
+        <div style="margin-top:6px;">RES <span id="sv-res" class="pill accent" style="margin-left:4px;">--</span></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-col">
+    <header class="topbar">
+      <button class="hamburger icon-btn" id="btn-open-drawer" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-title">Archive / Crusaders / Customizer</span>
+      <div class="topbar-spacer"></div>
+      <span class="status-pill" id="net-status"><span class="status-dot"></span><span id="net-status-text">CHECKING</span></span>
+      <button class="icon-btn" id="btn-theme" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/></svg>
+      </button>
+    </header>
+
+    <main id="main" class="content">
+
+      <!-- HERO -->
+      <section class="hero" id="sec-home">
+        <div class="eyebrow">Archive / Crusaders / Customizer</div>
+        <h1>Crusaders Bedrock Customizer</h1>
+        <p>Customize the latest Crusaders Bedrock Behaviour Pack without manually editing JavaScript.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="btn-hero-customize">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="5"/><circle cx="8" cy="12" r="3"/></svg>
+            Customize Pack
+          </button>
+          <button class="btn btn-secondary" id="btn-hero-view">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            View main.js
+          </button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-box"><div class="num" id="stat-beh">V--</div><div class="lbl">Behaviour version</div></div>
+          <div class="stat-box"><div class="num" id="stat-res">RES--</div><div class="lbl">Resource version</div></div>
+          <div class="stat-box"><div class="num" id="stat-features">0</div><div class="lbl">Detected features</div></div>
+        </div>
+      </section>
+
+      <!-- BASE PACKS + SOURCE -->
+      <section class="grid grid-2 section-gap" id="sec-features">
+        <div class="card">
+          <h2>Base Packs</h2>
+          <div class="sub">GitHub-detected Behaviour &amp; Resource packs</div>
+
+          <div class="source-toggle" role="group" aria-label="Pack source">
+            <button id="src-github" class="active" aria-pressed="true">GitHub Latest</button>
+            <button id="src-custom" aria-pressed="false">Custom Upload</button>
+          </div>
+
+          <div id="github-panel">
+            <div class="pack-row">
+              <span class="name">Behaviour Pack</span>
+              <span><span class="pill accent" id="row-beh-ver">--</span> <span class="pill" id="row-beh-status">idle</span></span>
+            </div>
+            <div class="pack-row"><span class="name" id="row-beh-file" style="color:var(--muted)">--</span></div>
+            <div class="pack-row">
+              <span class="name">Resource Pack</span>
+              <span><span class="pill accent" id="row-res-ver">--</span> <span class="pill" id="row-res-status">idle</span></span>
+            </div>
+            <div class="pack-row"><span class="name" id="row-res-file" style="color:var(--muted)">--</span></div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="btn btn-secondary" id="btn-refresh">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Refresh
+              </button>
+              <button class="btn btn-primary" id="btn-load">Load Latest Packs</button>
+            </div>
+          </div>
+
+          <div id="custom-panel" hidden>
+            <div class="upload-row">
+              <label for="up-beh">Custom Behaviour .mcpack</label>
+              <input type="file" id="up-beh" accept=".mcpack,.zip">
+            </div>
+            <div class="upload-row">
+              <label for="up-res">Custom Resource .mcpack</label>
+              <input type="file" id="up-res" accept=".mcpack,.zip">
+            </div>
+            <button class="btn btn-primary" id="btn-load-custom" style="margin-top:12px;">Load Custom Packs</button>
+          </div>
+        </div>
+
+        <div class="card" id="sec-toggles">
+          <h2>Status</h2>
+          <div class="sub">Pipeline log</div>
+          <div id="status-log"></div>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section class="card section-gap" id="sec-toggle-list">
+        <h2>Features</h2>
+        <div class="sub">Toggles reflect the current state of scripts/main.js</div>
+        <div id="feature-list"><p style="color:var(--muted);font-size:13px;">Load a Behaviour Pack to detect features.</p></div>
+      </section>
+
+      <!-- MAIN.JS PREVIEW + DIFF -->
+      <section class="card section-gap" id="sec-preview">
+        <div class="code-toolbar">
+          <div>
+            <h2 style="margin-bottom:2px;">main.js Preview</h2>
+            <div class="sub" style="margin-bottom:0;">scripts/main.js — live</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary" id="btn-copy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+            <button class="btn btn-secondary" id="btn-reset">Reset</button>
+          </div>
+        </div>
+        <pre class="code-block" id="code-preview">// Load a Behaviour Pack to view main.js</pre>
+        <h3 style="font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px;">Change Summary</h3>
+        <ul class="diff-list" id="diff-list"><li>No changes made.</li></ul>
+      </section>
+
+      <!-- BUILD -->
+      <section class="card section-gap" id="sec-commands">
+        <h2>Build</h2>
+        <div class="sub">Repackage the Behaviour Pack and generate the addon</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary" id="btn-build">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Build Behaviour
+          </button>
+          <button class="btn btn-primary" id="btn-generate">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Generate .mcaddon
+          </button>
+        </div>
+        <div id="build-status" style="margin-top:14px;"></div>
+      </section>
+
+      <!-- ADVANCED / DEBUG -->
+      <section class="card section-gap" id="sec-advanced">
+        <h2>Developer / Debug Panel</h2>
+        <div class="sub">Internal state</div>
+        <table class="debug-table" id="debug-table"></table>
+      </section>
+
+    </main>
+
+    <footer>Crusaders Bedrock Customizer — runs entirely in your browser. No data leaves your device except GitHub pack downloads.</footer>
+  </div>
+</div>
+
+<!-- Mobile drawer -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<nav class="drawer" id="drawer" aria-label="Primary mobile">
+  <div class="drawer-head">
+    <span style="font-family:var(--font-serif);font-size:18px;">Crusaders</span>
+    <button class="icon-btn" id="btn-close-drawer" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="nav-section">
+    <h3>Navigate</h3>
+    <button class="nav-item" data-nav="home">Home</button>
+    <button class="nav-item" data-nav="features">Features</button>
+    <button class="nav-item" data-nav="toggles">Toggles</button>
+    <button class="nav-item" data-nav="commands">Commands</button>
+    <button class="nav-item" data-nav="advanced">Advanced</button>
+  </div>
+</nav>
+
+<!-- Mobile bottom nav -->
+<nav class="bottom-nav" aria-label="Primary mobile bottom">
+  <button data-nav="home" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+    Home
+  </button>
+  <button data-nav="features">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    Features
+  </button>
+  <button data-nav="commands">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+    Settings
+  </button>
+  <button data-nav="advanced">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    Commands
+  </button>
+</nav>
+
+<button class="sound-fab" id="btn-sound" aria-label="Toggle UI sounds" aria-pressed="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="sound-icon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+</button>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   CONFIG — the only values that normally need to change
+   ========================================================= */
+const GITHUB_OWNER = "crusaderly";
+const GITHUB_REPO  = "CrusadersBedrock";
+const BASE_PATH    = "base";
+
+const BEH_REGEX = /^BedrockV\((\d+)\)R\[BEH\]\+\.mcpack$/;
+const RES_REGEX = /^CrusadersBedrock\[RES(\d+)\]\.mcpack$/;
+
+const FEATURE_CONFIG = {
+  "grave.js": { name: "Graves", desc: "Drops a grave with your items when you die." },
+  "tnt.js": { name: "Custom TNT", desc: "Adds custom TNT behaviour and blast tuning." },
+  "advancedCombat.js": { name: "Advanced Combat", desc: "Reworks combat timing, knockback and hit detection." },
+  "ranged_ai.js": { name: "Ranged AI", desc: "Gives hostile mobs ranged attack behaviour." }
+};
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  source: "github",           // "github" | "custom"
+  behVersion: null, behFile: null, behBytes: null, behEntries: null,
+  resVersion: null, resFile: null, resBytes: null, resEntries: null,
+  mainPath: null,
+  originalMainJS: null, currentMainJS: null,
+  importLines: [],            // {index, filename, path, commented, indent, quote}
+  toggles: {},                 // filename -> boolean (true = ON / uncommented)
+  originalToggles: {},
+  builtBehaviourBytes: null,
+  mcaddonBytes: null, mcaddonName: null,
+  online: navigator.onLine
+};
+
+/* =========================================================
+   CRC32
+   ========================================================= */
+const CRC_TABLE = (function(){
+  const t = [];
+  for (let n = 0; n < 256; n++){
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(buf){
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) crc = CRC_TABLE[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+/* =========================================================
+   Minimal raw DEFLATE decoder (RFC 1951) — decompress only.
+   Written from spec; no external code.
+   ========================================================= */
+const LEN_BASE  = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
+const LEN_EXTRA = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+const DIST_BASE  = [1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
+const DIST_EXTRA = [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+const CL_ORDER = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];
+
+function bitReader(data){
+  let pos = 0, bitpos = 0;
+  return {
+    bit(){
+      const b = (data[pos] >> bitpos) & 1;
+      bitpos++;
+      if (bitpos === 8){ bitpos = 0; pos++; }
+      return b;
+    },
+    bits(n){
+      let v = 0;
+      for (let i = 0; i < n; i++) v |= this.bit() << i;
+      return v >>> 0;
+    },
+    align(){ if (bitpos !== 0){ bitpos = 0; pos++; } },
+    getPos(){ return pos; },
+    setPos(p){ pos = p; bitpos = 0; }
+  };
+}
+function buildHuffman(lengths){
+  const MAXBITS = 15;
+  const count = new Array(MAXBITS + 1).fill(0);
+  for (let i = 0; i < lengths.length; i++) count[lengths[i]]++;
+  count[0] = 0;
+  const offs = new Array(MAXBITS + 2).fill(0);
+  for (let i = 1; i <= MAXBITS; i++) offs[i + 1] = offs[i] + count[i];
+  const symbol = new Array(lengths.length).fill(0);
+  const next = offs.slice();
+  for (let i = 0; i < lengths.length; i++){
+    if (lengths[i]) symbol[next[lengths[i]]++] = i;
+  }
+  return { count, symbol };
+}
+function decodeSym(br, huff){
+  let code = 0, first = 0, index = 0;
+  for (let len = 1; len <= 15; len++){
+    code |= br.bit();
+    const cnt = huff.count[len];
+    if (code - first < cnt) return huff.symbol[index + (code - first)];
+    index += cnt; first += cnt; first <<= 1; code <<= 1;
+  }
+  throw new Error("Corrupt compressed data: bad Huffman code");
+}
+function fixedLitTree(){
+  const l = new Array(288);
+  let i = 0;
+  for (; i < 144; i++) l[i] = 8;
+  for (; i < 256; i++) l[i] = 9;
+  for (; i < 280; i++) l[i] = 7;
+  for (; i < 288; i++) l[i] = 8;
+  return buildHuffman(l);
+}
+function fixedDistTree(){ return buildHuffman(new Array(30).fill(5)); }
+
+function inflateRaw(input){
+  const br = bitReader(input);
+  const out = [];
+  let capacity = 0;
+  let final = 0;
+  do {
+    final = br.bit();
+    const type = br.bits(2);
+    if (type === 0){
+      br.align();
+      const p = br.getPos();
+      const len = input[p] | (input[p+1] << 8);
+      br.setPos(p + 4);
+      for (let i = 0; i < len; i++) out.push(input[br.getPos()]), br.setPos(br.getPos() + 1);
+    } else if (type === 1 || type === 2){
+      let litTree, distTree;
+      if (type === 1){
+        litTree = fixedLitTree(); distTree = fixedDistTree();
+      } else {
+        const hlit = br.bits(5) + 257;
+        const hdist = br.bits(5) + 1;
+        const hclen = br.bits(4) + 4;
+        const clLengths = new Array(19).fill(0);
+        for (let i = 0; i < hclen; i++) clLengths[CL_ORDER[i]] = br.bits(3);
+        const clTree = buildHuffman(clLengths);
+        const lengths = [];
+        while (lengths.length < hlit + hdist){
+          const sym = decodeSym(br, clTree);
+          if (sym < 16) lengths.push(sym);
+          else if (sym === 16){
+            const rep = br.bits(2) + 3;
+            const prev = lengths[lengths.length - 1] || 0;
+            for (let i = 0; i < rep; i++) lengths.push(prev);
+          } else if (sym === 17){
+            const rep = br.bits(3) + 3;
+            for (let i = 0; i < rep; i++) lengths.push(0);
+          } else {
+            const rep = br.bits(7) + 11;
+            for (let i = 0; i < rep; i++) lengths.push(0);
+          }
+        }
+        litTree = buildHuffman(lengths.slice(0, hlit));
+        distTree = buildHuffman(lengths.slice(hlit));
+      }
+      while (true){
+        const sym = decodeSym(br, litTree);
+        if (sym === 256) break;
+        if (sym < 256){ out.push(sym); }
+        else {
+          const li = sym - 257;
+          if (li >= LEN_BASE.length) throw new Error("Corrupt compressed data: bad length code");
+          const len = LEN_BASE[li] + (LEN_EXTRA[li] ? br.bits(LEN_EXTRA[li]) : 0);
+          const dsym = decodeSym(br, distTree);
+          const dist = DIST_BASE[dsym] + (DIST_EXTRA[dsym] ? br.bits(DIST_EXTRA[dsym]) : 0);
+          const start = out.length - dist;
+          if (start < 0) throw new Error("Corrupt compressed data: bad back-reference");
+          for (let i = 0; i < len; i++) out.push(out[start + i]);
+        }
+      }
+    } else {
+      throw new Error("Corrupt compressed data: unsupported block type");
+    }
+  } while (!final);
+  return Uint8Array.from(out);
+}
+
+/* =========================================================
+   ZIP read / write. Unchanged entries are copied through in
+   their ORIGINAL compressed form (no inflate/store round trip)
+   so the pack doesn't balloon in size — only scripts/main.js
+   is actually re-encoded (stored, since it's tiny).
+   ========================================================= */
+function readZip(buffer){
+  const bytes = new Uint8Array(buffer);
+  const dv = new DataView(buffer);
+  let eocd = -1;
+  const minStart = Math.max(0, bytes.length - 22 - 65536);
+  for (let i = bytes.length - 22; i >= minStart; i--){
+    if (dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("Not a valid ZIP / .mcpack file (no End Of Central Directory record found)");
+  const entryCount = dv.getUint16(eocd + 10, true);
+  const cdOffset = dv.getUint32(eocd + 16, true);
+  const entries = [];
+  let ptr = cdOffset;
+  const decoder = new TextDecoder();
+  for (let i = 0; i < entryCount; i++){
+    const sig = dv.getUint32(ptr, true);
+    if (sig !== 0x02014b50) throw new Error("Corrupt central directory in archive");
+    const method = dv.getUint16(ptr + 10, true);
+    const crc = dv.getUint32(ptr + 16, true);
+    const compSize = dv.getUint32(ptr + 20, true);
+    const uncompSize = dv.getUint32(ptr + 24, true);
+    const nameLen = dv.getUint16(ptr + 28, true);
+    const extraLen = dv.getUint16(ptr + 30, true);
+    const commentLen = dv.getUint16(ptr + 32, true);
+    const localOffset = dv.getUint32(ptr + 42, true);
+    const name = decoder.decode(bytes.slice(ptr + 46, ptr + 46 + nameLen));
+    entries.push({ name, method, crc, compSize, uncompSize, localOffset });
+    ptr += 46 + nameLen + extraLen + commentLen;
+  }
+  // compData holds the RAW (still-compressed) bytes — cheap slice, no inflate here.
+  for (const e of entries){
+    if (e.name.endsWith("/")) { e.compData = new Uint8Array(0); continue; }
+    const lsig = dv.getUint32(e.localOffset, true);
+    if (lsig !== 0x04034b50) throw new Error("Corrupt local file header for " + e.name);
+    const lNameLen = dv.getUint16(e.localOffset + 26, true);
+    const lExtraLen = dv.getUint16(e.localOffset + 28, true);
+    const dataStart = e.localOffset + 30 + lNameLen + lExtraLen;
+    e.compData = bytes.slice(dataStart, dataStart + e.compSize);
+  }
+  return entries;
+}
+
+// Decompress an entry on demand (only needed for scripts/main.js). Cached.
+function decompressEntry(e){
+  if (e._decoded) return e._decoded;
+  let out;
+  if (e.method === 0) out = e.compData;
+  else if (e.method === 8) out = inflateRaw(e.compData);
+  else throw new Error("Unsupported compression method in " + e.name);
+  e._decoded = out;
+  return out;
+}
+
+// entries: [{ name, method, data (bytes already in `method`'s form), crc, uncompSize }]
+function writeZip(entries){
+  const encoder = new TextEncoder();
+  const localParts = [], centralParts = [];
+  let offset = 0;
+  for (const e of entries){
+    const nameBytes = encoder.encode(e.name);
+    const method = e.method || 0;
+    const compData = e.data;
+    const crc = e.crc >>> 0;
+    const compSize = compData.length;
+    const uncompSize = e.uncompSize;
+    const local = new Uint8Array(30 + nameBytes.length);
+    const lv = new DataView(local.buffer);
+    lv.setUint32(0, 0x04034b50, true);
+    lv.setUint16(4, 20, true);
+    lv.setUint16(6, 0, true);
+    lv.setUint16(8, method, true);
+    lv.setUint16(10, 0, true);
+    lv.setUint16(12, 0x21, true);
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, compSize, true);
+    lv.setUint32(22, uncompSize, true);
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);
+    local.set(nameBytes, 30);
+    localParts.push(local, compData);
+
+    const central = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(central.buffer);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true);
+    cv.setUint16(10, method, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0x21, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, compSize, true);
+    cv.setUint32(24, uncompSize, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
+    central.set(nameBytes, 46);
+    centralParts.push(central);
+
+    offset += local.length + compData.length;
+  }
+  const centralStart = offset;
+  let centralSize = 0;
+  for (const c of centralParts) centralSize += c.length;
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(8, entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, centralSize, true);
+  ev.setUint32(16, centralStart, true);
+
+  const allParts = localParts.concat(centralParts, [eocd]);
+  let total = 0;
+  for (const p of allParts) total += p.length;
+  const out = new Uint8Array(total);
+  let pos = 0;
+  for (const p of allParts){ out.set(p, pos); pos += p.length; }
+  return out;
+}
+
+/* =========================================================
+   UI helpers: logging, status pills, debug table
+   ========================================================= */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function logLine(msg, kind){
+  const el = document.createElement("div");
+  el.className = "log-line" + (kind === "err" ? " err" : kind === "ok" ? " ok" : "");
+  el.innerHTML = (kind === "busy" ? '<span class="spin"></span>' : "") + "<span></span>";
+  el.querySelector("span:last-child").textContent = msg;
+  const log = $("#status-log");
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+  return el;
+}
+function clearLog(){ $("#status-log").innerHTML = ""; }
+
+function setBehRow(status, cls){
+  $("#row-beh-status").textContent = status;
+  $("#row-beh-status").className = "pill " + (cls || "");
+}
+function setResRow(status, cls){
+  $("#row-res-status").textContent = status;
+  $("#row-res-status").className = "pill " + (cls || "");
+}
+
+function updateDebug(){
+  const rows = [
+    ["Repository", GITHUB_OWNER + "/" + GITHUB_REPO],
+    ["Base path", BASE_PATH],
+    ["Source", state.source],
+    ["Behaviour version", state.behVersion !== null ? "V" + state.behVersion : "Custom / unknown"],
+    ["Resource version", state.resVersion !== null ? "RES" + state.resVersion : "Custom / unknown"],
+    ["Behaviour file", state.behFile || "--"],
+    ["Resource file", state.resFile || "--"],
+    ["main.js path", state.mainPath || "--"],
+    ["Total imports detected", state.importLines.length],
+    ["Configurable features", state.importLines.filter(l => FEATURE_CONFIG[l.filename]).length],
+    ["Modified features", Object.keys(state.toggles).filter(f => state.toggles[f] !== state.originalToggles[f]).length],
+    ["Behaviour build status", state.builtBehaviourBytes ? "Built (" + state.builtBehaviourBytes.length + " bytes)" : "Not built"],
+    [".mcaddon status", state.mcaddonBytes ? "Ready — " + state.mcaddonName : "Not generated"]
+  ];
+  $("#debug-table").innerHTML = rows.map(r =>
+    "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>"
+  ).join("");
+}
+
+/* =========================================================
+   Network status
+   ========================================================= */
+function refreshNetStatus(){
+  state.online = navigator.onLine;
+  const pill = $("#net-status");
+  pill.className = "status-pill " + (state.online ? "online" : "offline");
+  $("#net-status-text").textContent = state.online ? "ONLINE" : "OFFLINE";
+}
+window.addEventListener("online", refreshNetStatus);
+window.addEventListener("offline", refreshNetStatus);
+
+/* =========================================================
+   GitHub discovery
+   ========================================================= */
+async function githubListBase(){
+  const url = "https://api.github.com/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/" + BASE_PATH;
+  const res = await fetch(url, { headers: { "Accept": "application/vnd.github+json" } });
+  if (!res.ok) throw new Error("GitHub request failed (" + res.status + "). Check GITHUB_OWNER / GITHUB_REPO / BASE_PATH.");
+  const json = await res.json();
+  if (!Array.isArray(json)) throw new Error("Unexpected response from GitHub — base path may not exist.");
+  return json;
+}
+function findLatest(files, regex){
+  let best = null, bestVer = -1;
+  for (const f of files){
+    const m = f.name.match(regex);
+    if (m){
+      const v = parseInt(m[1], 10);
+      if (v > bestVer){ bestVer = v; best = f; }
+    }
+  }
+  return best ? { file: best, version: bestVer } : null;
+}
+
+async function checkGithub(){
+  clearLog();
+  setBehRow("checking", "warn"); setResRow("checking", "warn");
+  logLine("CHECKING GITHUB...", "busy");
+  try {
+    const files = await githubListBase();
+    logLine("FINDING LATEST PACKS...", "busy");
+    const beh = findLatest(files, BEH_REGEX);
+    const res = findLatest(files, RES_REGEX);
+    if (!beh) throw new Error("No Behaviour Pack matching the expected filename pattern was found in " + BASE_PATH + "/.");
+    if (!res) throw new Error("No Resource Pack matching the expected filename pattern was found in " + BASE_PATH + "/.");
+    state.behVersion = beh.version; state.behFile = beh.file.name; state._behUrl = beh.file.download_url;
+    state.resVersion = res.version; state.resFile = res.file.name; state._resUrl = res.file.download_url;
+    $("#row-beh-ver").textContent = "V" + state.behVersion;
+    $("#row-beh-file").textContent = state.behFile;
+    $("#row-res-ver").textContent = "RES" + state.resVersion;
+    $("#row-res-file").textContent = state.resFile;
+    $("#sv-beh").textContent = "V" + state.behVersion;
+    $("#sv-res").textContent = "RES" + state.resVersion;
+    $("#stat-beh").textContent = "V" + state.behVersion;
+    $("#stat-res").textContent = "RES" + state.resVersion;
+    setBehRow("latest found", "ok"); setResRow("latest found", "ok");
+    logLine("Behaviour: " + state.behFile, "ok");
+    logLine("Resource: " + state.resFile, "ok");
+    updateDebug();
+    playSound("confirm");
+  } catch (err){
+    setBehRow("error", "bad"); setResRow("error", "bad");
+    logLine(err.message, "err");
+    playSound("error");
+    throw err;
+  }
+}
+
+async function loadGithubPacks(){
+  if (!state._behUrl || !state._resUrl){ await checkGithub(); }
+  clearLog();
+  try {
+    logLine("DOWNLOADING BEHAVIOUR PACK...", "busy");
+    const behRes = await fetch(state._behUrl);
+    if (!behRes.ok) throw new Error("Failed to download Behaviour Pack (" + behRes.status + ").");
+    state.behBytes = new Uint8Array(await behRes.arrayBuffer());
+    logLine("Behaviour Pack downloaded (" + state.behBytes.length + " bytes)", "ok");
+
+    logLine("DOWNLOADING RESOURCE PACK...", "busy");
+    const resRes = await fetch(state._resUrl);
+    if (!resRes.ok) throw new Error("Failed to download Resource Pack (" + resRes.status + ").");
+    state.resBytes = new Uint8Array(await resRes.arrayBuffer());
+    logLine("Resource Pack downloaded (" + state.resBytes.length + " bytes)", "ok");
+
+    await processBehaviourPack();
+    setBehRow("loaded", "ok"); setResRow("loaded", "ok");
+    playSound("confirm");
+  } catch (err){
+    logLine(err.message, "err");
+    setBehRow("error", "bad");
+    playSound("error");
+  }
+}
+
+/* =========================================================
+   Custom upload
+   ========================================================= */
+async function loadCustomPacks(){
+  clearLog();
+  const behFile = $("#up-beh").files[0];
+  const resFile = $("#up-res").files[0];
+  if (!behFile || !resFile){
+    logLine("Select both a custom Behaviour .mcpack and a custom Resource .mcpack.", "err");
+    playSound("error");
+    return;
+  }
+  try {
+    logLine("READING CUSTOM PACKS...", "busy");
+    state.behBytes = new Uint8Array(await behFile.arrayBuffer());
+    state.resBytes = new Uint8Array(await resFile.arrayBuffer());
+    state.behFile = behFile.name; state.resFile = resFile.name;
+    const behMatch = behFile.name.match(BEH_REGEX);
+    state.behVersion = behMatch ? parseInt(behMatch[1], 10) : null;
+    const resMatch = resFile.name.match(RES_REGEX);
+    state.resVersion = resMatch ? parseInt(resMatch[1], 10) : null;
+    $("#row-beh-file").textContent = state.behFile;
+    $("#row-res-file").textContent = state.resFile;
+    $("#stat-beh").textContent = state.behVersion !== null ? "V" + state.behVersion : "Custom";
+    $("#stat-res").textContent = state.resVersion !== null ? "RES" + state.resVersion : "Custom";
+    await processBehaviourPack();
+    setBehRow("loaded", "ok"); setResRow("loaded", "ok");
+    playSound("confirm");
+  } catch (err){
+    logLine(err.message, "err");
+    setBehRow("error", "bad");
+    playSound("error");
+  }
+}
+
+/* =========================================================
+   Behaviour Pack processing — extract, find main.js, detect imports
+   ========================================================= */
+const IMPORT_LINE_RE = /^(\s*)(\/\/\s*)?import\s*\(?\s*["']([^"']+\.js)["']\s*\)?\s*;?\s*$/;
+
+async function processBehaviourPack(){
+  logLine("ANALYZING MAIN.JS...", "busy");
+  let entries;
+  try {
+    entries = readZip(state.behBytes.buffer.slice(state.behBytes.byteOffset, state.behBytes.byteOffset + state.behBytes.byteLength));
+  } catch (err){
+    throw new Error("Invalid Behaviour Pack ZIP: " + err.message);
+  }
+  state.behEntries = entries;
+  const mainEntry = entries.find(e => e.name.toLowerCase() === "scripts/main.js");
+  if (!mainEntry) throw new Error("scripts/main.js was not found inside the Behaviour Pack.");
+  state.mainPath = mainEntry.name;
+
+  let text;
+  try {
+    text = new TextDecoder("utf-8", { fatal: false }).decode(decompressEntry(mainEntry));
+  } catch (err){
+    throw new Error("scripts/main.js could not be read as text.");
+  }
+  state.originalMainJS = text;
+  state.currentMainJS = text;
+
+  logLine("DETECTING FEATURES...", "busy");
+  const lines = text.split("\n");
+  const importLines = [];
+  lines.forEach((line, idx) => {
+    const m = line.match(IMPORT_LINE_RE);
+    if (m){
+      const commented = !!m[2];
+      const path = m[3];
+      const filename = path.split("/").pop();
+      importLines.push({ index: idx, path, filename, commented, indent: m[1] });
+    }
+  });
+  state.importLines = importLines;
+  state.toggles = {};
+  state.originalToggles = {};
+  for (const l of importLines){
+    state.toggles[l.filename] = !l.commented;
+    state.originalToggles[l.filename] = !l.commented;
+  }
+
+  $("#stat-features").textContent = importLines.length;
+  logLine("Detected " + importLines.length + " import(s)", "ok");
+  logLine("READY", "ok");
+  renderFeatures();
+  renderPreview();
+  updateDebug();
+}
+
+/* =========================================================
+   Feature rendering / toggling
+   ========================================================= */
+function renderFeatures(){
+  const container = $("#feature-list");
+  if (!state.importLines.length){
+    container.innerHTML = '<p style="color:var(--muted);font-size:13px;">No feature imports were detected in main.js.</p>';
+    return;
+  }
+  const known = state.importLines.filter(l => FEATURE_CONFIG[l.filename]);
+  const other = state.importLines.filter(l => !FEATURE_CONFIG[l.filename]);
+  let html = "";
+  if (known.length){
+    html += '<div class="feature-group"><h3>Features</h3>';
+    for (const l of known){
+      html += featureCardHTML(l, FEATURE_CONFIG[l.filename].name, FEATURE_CONFIG[l.filename].desc);
+    }
+    html += "</div>";
+  }
+  if (other.length){
+    html += '<div class="feature-group"><h3>Other Imports</h3>';
+    for (const l of other){
+      html += featureCardHTML(l, humanizeFilename(l.filename), "Unrecognized import — enable or disable as needed.");
+    }
+    html += "</div>";
+  }
+  container.innerHTML = html;
+  $$(".toggle").forEach(t => t.addEventListener("click", onToggleClick));
+}
+function humanizeFilename(filename){
+  const base = filename.replace(/\.js$/i, "");
+  const spaced = base
+    .replace(/[_\-]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .trim();
+  return spaced.split(" ").filter(Boolean).map(w =>
+    w === w.toUpperCase() && w.length > 1 ? w : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+  ).join(" ");
+}
+function featureCardHTML(l, name, desc){
+  const on = state.toggles[l.filename];
+  return (
+    '<div class="feature-card">' +
+      '<div class="feature-info">' +
+        '<div class="fname">' + escapeHTML(name) + '</div>' +
+        '<div class="ffile">' + escapeHTML(l.filename) + '</div>' +
+        '<div class="fdesc">' + escapeHTML(desc) + '</div>' +
+      '</div>' +
+      '<div class="toggle-wrap">' +
+        '<button class="toggle" role="switch" aria-checked="' + on + '" aria-pressed="' + on + '" data-file="' + escapeHTML(l.filename) + '" aria-label="' + escapeHTML(name) + '"><span class="knob"></span></button>' +
+        '<div class="toggle-lbl">' + (on ? "ON" : "OFF") + '</div>' +
+      '</div>' +
+    '</div>'
+  );
+}
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+function onToggleClick(e){
+  const btn = e.currentTarget;
+  const filename = btn.dataset.file;
+  state.toggles[filename] = !state.toggles[filename];
+  applyToggles();
+  renderFeatures();
+  renderPreview();
+  updateDiff();
+  updateDebug();
+  playSound("toggle");
+}
+
+function applyToggles(){
+  const lines = state.originalMainJS.split("\n");
+  for (const l of state.importLines){
+    const shouldBeOn = state.toggles[l.filename];
+    const original = lines[l.index];
+    const m = original.match(IMPORT_LINE_RE);
+    if (!m) continue;
+    const indent = m[1];
+    const rest = original.slice(indent.length).replace(/^\/\/\s*/, "");
+    lines[l.index] = shouldBeOn ? (indent + rest) : (indent + "//" + rest);
+  }
+  state.currentMainJS = lines.join("\n");
+}
+
+function renderPreview(){
+  const lines = state.currentMainJS.split("\n");
+  const importIdx = new Set(state.importLines.map(l => l.index));
+  const html = lines.map((line, i) => {
+    const isOff = importIdx.has(i) && line.trim().startsWith("//");
+    const esc = escapeHTML(line);
+    return isOff ? '<span class="ln-off">' + esc + "</span>" : esc;
+  }).join("\n");
+  $("#code-preview").innerHTML = html || "// (empty file)";
+}
+
+function updateDiff(){
+  const changes = [];
+  for (const l of state.importLines){
+    const name = FEATURE_CONFIG[l.filename] ? FEATURE_CONFIG[l.filename].name : l.filename;
+    const was = state.originalToggles[l.filename];
+    const now = state.toggles[l.filename];
+    if (was !== now){
+      changes.push(name + ": " + (was ? "ON" : "OFF") + " → " + (now ? "ON" : "OFF"));
+    }
+  }
+  $("#diff-list").innerHTML = changes.length
+    ? changes.map(c => "<li>" + escapeHTML(c) + "</li>").join("")
+    : "<li>No changes made.</li>";
+}
+
+function resetAll(){
+  if (!state.originalMainJS) return;
+  state.currentMainJS = state.originalMainJS;
+  for (const k of Object.keys(state.originalToggles)) state.toggles[k] = state.originalToggles[k];
+  state.builtBehaviourBytes = null;
+  state.mcaddonBytes = null; state.mcaddonName = null;
+  renderFeatures();
+  renderPreview();
+  updateDiff();
+  updateDebug();
+  $("#build-status").innerHTML = "";
+  playSound("confirm");
+}
+
+/* =========================================================
+   Build Behaviour Pack / Generate .mcaddon
+   ========================================================= */
+function buildBehaviourPack(){
+  if (!state.behEntries) throw new Error("No Behaviour Pack loaded.");
+  logLine2("BUILDING BEHAVIOUR PACK...", "busy");
+  const encoder = new TextEncoder();
+  const newEntries = state.behEntries
+    .filter(e => !e.name.endsWith("/"))
+    .map(e => {
+      if (e.name.toLowerCase() === "scripts/main.js"){
+        // Only this file actually changes — store it raw (it's tiny either way).
+        const bytes = encoder.encode(state.currentMainJS);
+        return { name: e.name, method: 0, data: bytes, crc: crc32(bytes), uncompSize: bytes.length };
+      }
+      // Everything else is copied through untouched, still in its original
+      // compressed form, so the pack doesn't grow.
+      return { name: e.name, method: e.method, data: e.compData, crc: e.crc, uncompSize: e.uncompSize };
+    });
+  const zipBytes = writeZip(newEntries);
+  state.builtBehaviourBytes = zipBytes;
+  logLine2("Behaviour Pack built (" + zipBytes.length + " bytes)", "ok");
+  updateDebug();
+  return zipBytes;
+}
+
+function validateArchive(bytes, expectedNames){
+  let entries;
+  try {
+    entries = readZip(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+  } catch (err){
+    throw new Error("VALIDATION FAILED — the generated archive is not a readable ZIP (" + err.message + ").");
+  }
+  const names = entries.map(e => e.name);
+  for (const n of expectedNames){
+    if (!names.includes(n)) throw new Error("VALIDATION FAILED — " + n + " is missing from the generated archive.");
+  }
+  return true;
+}
+
+function generateMcaddon(){
+  logLine2("PACKAGING MCADDON...", "busy");
+  if (!state.builtBehaviourBytes){
+    buildBehaviourPack();
+  }
+  if (!state.resBytes) throw new Error("No Resource Pack loaded — cannot generate .mcaddon.");
+
+  const behEntry = { name: "Crusaders_Custom_Behaviour.mcpack", data: state.builtBehaviourBytes };
+  const resEntry = { name: "Crusaders_Custom_Resource.mcpack", data: state.resBytes };
+  const mcaddonBytes = writeZip([behEntry, resEntry]);
+
+  logLine2("VALIDATING...", "busy");
+  validateArchive(mcaddonBytes, ["Crusaders_Custom_Behaviour.mcpack", "Crusaders_Custom_Resource.mcpack"]);
+
+  const versionLabel = state.behVersion !== null ? String(state.behVersion) : "Custom";
+  const filename = "CrusadersBedrock(" + versionLabel + ").mcaddon";
+
+  state.mcaddonBytes = mcaddonBytes;
+  state.mcaddonName = filename;
+  logLine2("MCADDON READY — " + filename, "ok");
+  updateDebug();
+  return { bytes: mcaddonBytes, filename };
+}
+
+function logLine2(msg, kind){
+  const el = document.createElement("div");
+  el.className = "log-line" + (kind === "err" ? " err" : kind === "ok" ? " ok" : "");
+  el.innerHTML = (kind === "busy" ? '<span class="spin"></span>' : "") + "<span></span>";
+  el.querySelector("span:last-child").textContent = msg;
+  const box = $("#build-status");
+  box.appendChild(el);
+  return el;
+}
+
+function downloadBlob(bytes, filename, mime){
+  const blob = new Blob([bytes], { type: mime || "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* =========================================================
+   Sound (Web Audio, single reusable context)
+   ========================================================= */
+let audioCtx = null;
+let soundOn = true;
+function ensureAudio(){
+  if (!audioCtx){
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ audioCtx = null; }
+  }
+  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+}
+function playSound(kind){
+  if (!soundOn) return;
+  ensureAudio();
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  const map = {
+    nav: [520, 0.05], toggle: [420, 0.06], confirm: [660, 0.09],
+    error: [180, 0.14], theme: [500, 0.06]
+  };
+  const [freq, dur] = map[kind] || [440, 0.06];
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(freq, now);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.06, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+  osc.start(now);
+  osc.stop(now + dur + 0.02);
+}
+
+/* =========================================================
+   Theme
+   ========================================================= */
+function initTheme(){
+  const saved = localStorage.getItem("cbc-theme");
+  const theme = saved || "dark";
+  document.documentElement.setAttribute("data-theme", theme);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("cbc-theme", next);
+  playSound("theme");
+}
+
+/* =========================================================
+   Navigation (sidebar / drawer / bottom nav) — scroll to section
+   ========================================================= */
+const NAV_TARGETS = {
+  home: "#sec-home", features: "#sec-features", toggles: "#sec-toggle-list",
+  commands: "#sec-commands", advanced: "#sec-advanced"
+};
+function setActiveNav(key){
+  $$(".nav-item[data-nav]").forEach(b => b.classList.toggle("active", b.dataset.nav === key));
+  $$(".bottom-nav button[data-nav]").forEach(b => b.classList.toggle("active", b.dataset.nav === key));
+}
+function goNav(key){
+  const target = NAV_TARGETS[key];
+  if (target){
+    const el = $(target);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  setActiveNav(key);
+  closeDrawer();
+  playSound("nav");
+}
+
+/* =========================================================
+   Drawer
+   ========================================================= */
+function openDrawer(){
+  $("#drawer").classList.add("open");
+  $("#drawer-overlay").classList.add("open");
+  $("#btn-open-drawer").setAttribute("aria-expanded", "true");
+}
+function closeDrawer(){
+  $("#drawer").classList.remove("open");
+  $("#drawer-overlay").classList.remove("open");
+  $("#btn-open-drawer").setAttribute("aria-expanded", "false");
+}
+
+/* =========================================================
+   Wire up UI
+   ========================================================= */
+function wire(){
+  initTheme();
+  refreshNetStatus();
+
+  $$("[data-nav]").forEach(b => b.addEventListener("click", () => goNav(b.dataset.nav)));
+  $("#btn-open-drawer").addEventListener("click", openDrawer);
+  $("#btn-close-drawer").addEventListener("click", closeDrawer);
+  $("#drawer-overlay").addEventListener("click", closeDrawer);
+  $("#btn-theme").addEventListener("click", toggleTheme);
+
+  $("#btn-sound").addEventListener("click", () => {
+    soundOn = !soundOn;
+    $("#btn-sound").setAttribute("aria-pressed", String(soundOn));
+    $("#btn-sound").style.opacity = soundOn ? "1" : "0.5";
+    if (soundOn) playSound("confirm");
+  });
+
+  $("#src-github").addEventListener("click", () => {
+    state.source = "github";
+    $("#src-github").classList.add("active"); $("#src-github").setAttribute("aria-pressed","true");
+    $("#src-custom").classList.remove("active"); $("#src-custom").setAttribute("aria-pressed","false");
+    $("#github-panel").hidden = false; $("#custom-panel").hidden = true;
+    updateDebug();
+  });
+  $("#src-custom").addEventListener("click", () => {
+    state.source = "custom";
+    $("#src-custom").classList.add("active"); $("#src-custom").setAttribute("aria-pressed","true");
+    $("#src-github").classList.remove("active"); $("#src-github").setAttribute("aria-pressed","false");
+    $("#custom-panel").hidden = false; $("#github-panel").hidden = true;
+    updateDebug();
+  });
+
+  $("#btn-refresh").addEventListener("click", () => checkGithub().catch(()=>{}));
+  $("#btn-load").addEventListener("click", loadGithubPacks);
+  $("#btn-load-custom").addEventListener("click", loadCustomPacks);
+  $("#btn-hero-customize").addEventListener("click", () => goNav("features"));
+  $("#btn-hero-view").addEventListener("click", () => goNav("toggles"));
+
+  $("#btn-copy").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(state.currentMainJS || "");
+      const btn = $("#btn-copy");
+      const original = btn.innerHTML;
+      btn.innerHTML = "Copied";
+      setTimeout(() => { btn.innerHTML = original; }, 1200);
+      playSound("confirm");
+    } catch (e){ playSound("error"); }
+  });
+  $("#btn-reset").addEventListener("click", resetAll);
+
+  $("#btn-build").addEventListener("click", () => {
+    $("#build-status").innerHTML = "";
+    try {
+      buildBehaviourPack();
+      playSound("confirm");
+    } catch (err){
+      logLine2(err.message, "err");
+      playSound("error");
+    }
+  });
+
+  $("#btn-generate").addEventListener("click", () => {
+    $("#build-status").innerHTML = "";
+    try {
+      const { bytes, filename } = generateMcaddon();
+      downloadBlob(bytes, filename, "application/zip");
+      playSound("confirm");
+    } catch (err){
+      logLine2(err.message, "err");
+      playSound("error");
+    }
+  });
+
+  updateDebug();
+}
+
+document.addEventListener("DOMContentLoaded", wire);
+})();
+</script>
+</body>
+</html>
