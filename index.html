@@ -181,6 +181,14 @@ html[data-theme="light"] .code-block{background:#20191A;color:#EEE5D8;}
   border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:6px;
 }
 .protected-list li svg{width:12px;height:12px;color:var(--muted);flex-shrink:0;}
+.doc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto;}
+.doc-row{
+  display:grid;grid-template-columns:150px 1fr;gap:14px;padding:8px 4px;border-bottom:1px solid var(--border);
+}
+.doc-row:last-child{border-bottom:none;}
+.doc-row code{font-family:var(--font-mono);font-size:12px;color:var(--accent);word-break:break-all;}
+.doc-row em{font-style:italic;font-size:12.5px;color:var(--text2);}
+@media(max-width:700px){.doc-row{grid-template-columns:1fr;gap:3px;}}
 .collapse-panel .code-block{margin:0;border:none;border-radius:0;max-height:360px;}
 .steps-list{list-style:none;margin:0;padding:0;counter-reset:step;display:grid;gap:10px;}
 .steps-list li{
@@ -332,11 +340,10 @@ footer{padding:28px 24px 100px;color:var(--muted);font-size:12px;font-family:var
         <h2>How To Use</h2>
         <div class="sub">Five steps, start to finish</div>
         <ol class="steps-list">
-          <li>Import your pack</li>
-          <li>Toggle what you like</li>
-          <li>Export your fixed behaviour pack</li>
-          <li>Cut the file into the scripts/main.js</li>
-          <li>Import into MC</li>
+          <li>Tap Load Latest Packs, or load your own</li>
+          <li>Toggle what you want on/off</li>
+          <li>Export the .mcaddon</li>
+          <li>Import the .mcaddon into Minecraft</li>
         </ol>
       </section>
 
@@ -391,6 +398,17 @@ footer{padding:28px 24px 100px;color:var(--muted);font-size:12px;font-family:var
         </div>
       </section>
 
+      <!-- SCRIPT REFERENCE -->
+      <section class="card section-gap">
+        <details class="collapse-panel" style="margin-top:0;">
+          <summary>Script Reference <span class="pill" id="script-docs-count">0</span></summary>
+          <div class="collapse-body">
+            <p class="sub">What every file in the pack does.</p>
+            <ul class="doc-list" id="script-docs-list"></ul>
+          </div>
+        </details>
+      </section>
+
       <!-- FEATURES -->
       <section class="card section-gap" id="sec-toggle-list">
         <h2>Features</h2>
@@ -399,7 +417,7 @@ footer{padding:28px 24px 100px;color:var(--muted);font-size:12px;font-family:var
         <details class="collapse-panel" id="protected-panel" hidden>
           <summary>Protected Imports <span class="pill" id="protected-count">0</span></summary>
           <div class="collapse-body">
-            <p class="sub">Core to the mod — always on, not shown as toggles.</p>
+            <p class="sub">Core to the mod: always on, not shown as toggles.</p>
             <ul class="protected-list" id="protected-list"></ul>
           </div>
         </details>
@@ -410,7 +428,7 @@ footer{padding:28px 24px 100px;color:var(--muted);font-size:12px;font-family:var
         <div class="code-toolbar">
           <div>
             <h2 style="margin-bottom:2px;">main.js Preview</h2>
-            <div class="sub" style="margin-bottom:0;">scripts/main.js — live</div>
+            <div class="sub" style="margin-bottom:0;">scripts/main.js (live)</div>
           </div>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary" id="btn-copy">
@@ -454,7 +472,7 @@ footer{padding:28px 24px 100px;color:var(--muted);font-size:12px;font-family:var
 
     </main>
 
-    <footer>Crusaders Bedrock Customizer — runs entirely in your browser. No data leaves your device except GitHub pack downloads.</footer>
+    <footer>Crusaders Bedrock Customizer. Runs entirely in your browser. No data leaves your device except GitHub pack downloads.</footer>
   </div>
 </div>
 
@@ -516,10 +534,21 @@ const BEH_REGEX = /^BedrockV\((\d+)\)R\[BEH\]\+\.mcpack$/;
 const RES_REGEX = /^CrusadersBedrock\[RES(\d+)\]\.mcpack$/;
 
 const FEATURE_CONFIG = {
-  "grave.js": { name: "Graves", desc: "Drops a grave with your items when you die." },
-  "tnt.js": { name: "Custom TNT", desc: "Adds custom TNT behaviour and blast tuning." },
-  "advancedCombat.js": { name: "Advanced Combat", desc: "Reworks combat timing, knockback and hit detection." },
-  "ranged_ai.js": { name: "Ranged AI", desc: "Gives hostile mobs ranged attack behaviour." }
+  "grave.js": { name: "Graves", desc: "Player death creates a temporary soul chest grave that despawns after an hour." },
+  "cassino.js": { name: "Cassino", desc: "Gambling minigame block: pay a cost item, get a random reward from a pool." },
+  "timeout.js": { name: "Timeout", desc: "Punishment/timeout system: freezes a player at a location, tracks original position via tags." },
+  "PERSONALITY.js": { name: "Personality", desc: "Randomizes villager name tags on spawn from a big name pool." },
+  "cleanup.js": { name: "Cleanup", desc: "Converts a killed bone golem pet entity back into its spawn egg item." },
+  "Kit.js": { name: "Kit", desc: "Spawns a floating glass platform / starter kit structure on first join." },
+  "LIVES.js": { name: "Lives", desc: "Life system: die and lose all your lives, then go into spectator mode until revived via beacon." },
+  "STONECUTTER.js": { name: "Stonecutter", desc: "Large custom block-shape/fill tool using iron/gold blocks as currency, GUI-driven." },
+  "Railplacer.js": { name: "Rail Placer", desc: "Auto-places rail (and spaced torches) as the player walks/rides." },
+  "carry.js": { name: "Carry", desc: "Lets players carry certain blocks/mobs, with cooldown-limited pickup sounds/messages." },
+  "java_notblock.js": { name: "Java Notblock", desc: "Right-clicking red nether brick (when not sneaking) can be observed via observer, like Java." },
+  "treeCap.js": { name: "Tree Capitator", desc: "Breaking one log instantly fells and collects the whole tree." },
+  "pokemon.js": { name: "Pokemon Catching", desc: "Golden hoe plus damaging a mob (at player level 5+) has a chance to give that mob's spawn egg." },
+  "fireball.js": { name: "Fireball", desc: "Fire charge item throws an actual fireball projectile, like a ghast." },
+  "seasons.js": { name: "Seasons", desc: "Five-season cycle system with per-season weather/effects and announcements." }
 };
 
 // Core to the mod — never shown as a toggle, never touched on build.
@@ -530,6 +559,45 @@ const PROTECTED_IMPORTS = [
   "costomblocks.js", "shell.js", "WorldEdit.js", "Warps.js"
 ];
 const PROTECTED_SET = new Set(PROTECTED_IMPORTS);
+
+// Static reference doc for every script in the pack, shown in a collapsible
+// panel above the toggle list. Independent of whatever's actually detected
+// in the currently loaded main.js.
+const SCRIPT_DOCS = [
+  { file: "main.js", desc: "Entry point. Imports every other script below; without this file, none of them will run." },
+  { file: "START.js", desc: "First-join welcome GUI, sets base gamerules, gives a temp item, custom block info menu (Impulse/Inverse Impulse/Block Placer/Teleporter)." },
+  { file: "Czech.js", desc: "Item-triggered admin menus: creeper head (teleport/spawn/gamerules/reset), operator clock (run any command), compass (teleport/weather/dash)." },
+  { file: "detonator.js", desc: "Stone button used as a remote detonator trigger." },
+  { file: "Teleport.js", desc: "Recovery compass opens a UI to teleport the player." },
+  { file: "cassino.js", desc: "Gambling minigame block: pay a cost item, get a random reward from a pool." },
+  { file: "costomblocks.js", desc: "Logic for the 4 custom redstone blocks (Impulse, Inverse Impulse, Entity Teleporter, Block Placer)." },
+  { file: "shell.js", desc: "Tags player-shot arrows and adds special \"Crusader Shell\" teleport-on-sneak behavior." },
+  { file: "timeout.js", desc: "Punishment/timeout system: freezes a player at a location, tracks original position via tags." },
+  { file: "PERSONALITY.js", desc: "Randomizes villager name tags on spawn from a big name pool." },
+  { file: "WorldEdit.js", desc: "WorldEdit-style tool (wooden axe): set pos1/pos2, fill regions, quick-pick block palette (admin only)." },
+  { file: "Warps.js", desc: "Homes, back, TPA, and player stats system (homes double as lodestone waypoints)." },
+  { file: "cleanup.js", desc: "Converts a killed bone golem pet entity back into its spawn egg item." },
+  { file: "Kit.js", desc: "Spawns a floating glass platform / starter kit structure on first join." },
+  { file: "stone_hoe.js", desc: "Stone hoe becomes an adjustable magnet/repulsor with a strength meter shown on the action bar." },
+  { file: "scroll.js", desc: "Binds a command to a paper scroll by combining it with a lodestone block." },
+  { file: "heal.js", desc: "Java-style food regeneration effects (extra healing per food type for vanilla)." },
+  { file: "LIVES.js", desc: "Turns on a life system: die and lose all your lives, then go into spectator mode until revived via beacon." },
+  { file: "STONECUTTER.js", desc: "Large custom block-shape/fill tool using iron/gold blocks as currency, GUI-driven." },
+  { file: "Railplacer.js", desc: "Auto-places rail (and spaced torches) as the player walks/rides." },
+  { file: "carry.js", desc: "Lets players carry certain blocks/mobs, with cooldown-limited pickup sounds/messages." },
+  { file: "java_notblock.js", desc: "Right-clicking red nether brick (when not sneaking) can be observed via observer, like Java." },
+  { file: "treeCap.js", desc: "Axe tree capitator: breaking one log instantly fells and collects the whole tree." },
+  { file: "grappleSys.js", desc: "Named \"grapple\" sword and arrow act as a grappling hook." },
+  { file: "grave.js", desc: "Player death creates a temporary soul chest grave that despawns after an hour." },
+  { file: "pokemon.js", desc: "Golden hoe plus damaging a mob (at player level 5+) has a chance to give that mob's spawn egg, a catching mechanic." },
+  { file: "fireball.js", desc: "Fire charge item throws an actual fireball projectile, like a ghast." },
+  { file: "seasons.js", desc: "Five-season cycle system with per-season weather/effects and announcements." },
+  { file: "turn.js", desc: "Copper hoe lets players rotate/move placed blocks." },
+  { file: "costompotions.js", desc: "Custom potion-effect crafting block, adds effects to potions/weapons using glowstone dust." },
+  { file: "rightequip.js", desc: "Auto-swaps specific items (totem, shield, nautilus shell, etc.) to offhand when used, with a dupe-trigger set." },
+  { file: "bow_ding.js", desc: "Plays a \"ding\" sound when a player's arrow hits an entity." },
+  { file: "leaves.js", desc: "Custom behavior tied to interacting with leaf blocks." }
+];
 
 /* =========================================================
    STATE
@@ -869,7 +937,7 @@ function updateDebug(){
     ["Protected imports", state.importLines.filter(l => PROTECTED_SET.has(l.filename)).length],
     ["Modified features", Object.keys(state.toggles).filter(f => state.toggles[f] !== state.originalToggles[f]).length],
     ["Behaviour build status", state.builtBehaviourBytes ? "Built (" + state.builtBehaviourBytes.length + " bytes)" : "Not built"],
-    [".mcaddon status", state.mcaddonBytes ? "Ready — " + state.mcaddonName : "Not generated"]
+    [".mcaddon status", state.mcaddonBytes ? "Ready: " + state.mcaddonName : "Not generated"]
   ];
   $("#debug-table").innerHTML = rows.map(r =>
     "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>"
@@ -896,7 +964,7 @@ async function githubListBase(){
   const res = await fetch(url, { headers: { "Accept": "application/vnd.github+json" } });
   if (!res.ok) throw new Error("GitHub request failed (" + res.status + "). Check GITHUB_OWNER / GITHUB_REPO / BASE_PATH.");
   const json = await res.json();
-  if (!Array.isArray(json)) throw new Error("Unexpected response from GitHub — base path may not exist.");
+  if (!Array.isArray(json)) throw new Error("Unexpected response from GitHub. Base path may not exist.");
   return json;
 }
 function findLatest(files, regex){
@@ -1087,7 +1155,7 @@ function renderFeatures(){
   if (other.length){
     html += '<div class="feature-group"><h3>Other Imports</h3>';
     for (const l of other){
-      html += featureCardHTML(l, humanizeFilename(l.filename), "Unrecognized import — enable or disable as needed.");
+      html += featureCardHTML(l, humanizeFilename(l.filename), "Unrecognized import. Enable or disable as needed.");
     }
     html += "</div>";
   }
@@ -1115,6 +1183,16 @@ function renderProtected(protectedLines){
     '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>' +
     escapeHTML(l.filename) + "</li>"
   ).join("");
+}
+
+function renderScriptDocs(){
+  const list = $("#script-docs-list");
+  if (!list) return;
+  list.innerHTML = SCRIPT_DOCS.map(d =>
+    '<li class="doc-row"><code>' + escapeHTML(d.file) + '</code><em>' + escapeHTML(d.desc) + '</em></li>'
+  ).join("");
+  const count = $("#script-docs-count");
+  if (count) count.textContent = String(SCRIPT_DOCS.length);
 }
 function humanizeFilename(filename){
   const base = filename.replace(/\.js$/i, "");
@@ -1244,12 +1322,12 @@ function validateArchive(bytes, expectedNames){
   try {
     entries = readZip(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
   } catch (err){
-    throw new Error("VALIDATION FAILED — the generated archive is not a readable ZIP (" + err.message + ").");
+    throw new Error("VALIDATION FAILED: the generated archive is not a readable ZIP (" + err.message + ").");
   }
   for (const n of expectedNames){
     const entry = entries.find(e => e.name === n);
-    if (!entry) throw new Error("VALIDATION FAILED — " + n + " is missing from the generated archive.");
-    if (entry.uncompSize === 0) throw new Error("VALIDATION FAILED — " + n + " was packaged with a reported size of 0 bytes.");
+    if (!entry) throw new Error("VALIDATION FAILED: " + n + " is missing from the generated archive.");
+    if (entry.uncompSize === 0) throw new Error("VALIDATION FAILED: " + n + " was packaged with a reported size of 0 bytes.");
   }
   return true;
 }
@@ -1259,7 +1337,7 @@ function generateMcaddon(){
   if (!state.builtBehaviourBytes){
     buildBehaviourPack();
   }
-  if (!state.resBytes) throw new Error("No Resource Pack loaded — cannot generate .mcaddon.");
+  if (!state.resBytes) throw new Error("No Resource Pack loaded. Cannot generate .mcaddon.");
 
   const behVersionLabel = state.behVersion !== null ? String(state.behVersion) : "Custom";
   const resVersionLabel = state.resVersion !== null ? String(state.resVersion) : "Custom";
@@ -1275,14 +1353,14 @@ function generateMcaddon(){
   logLine2("VALIDATING...", "busy");
   validateArchive(mcaddonBytes, [behEntryName, resEntryName]);
   if (behEntry.uncompSize === 0 || resEntry.uncompSize === 0){
-    throw new Error("VALIDATION FAILED — a packaged .mcpack reported 0 bytes.");
+    throw new Error("VALIDATION FAILED: a packaged .mcpack reported 0 bytes.");
   }
 
   const filename = "CrusadersBedrock(" + behVersionLabel + ").mcaddon";
 
   state.mcaddonBytes = mcaddonBytes;
   state.mcaddonName = filename;
-  logLine2("MCADDON READY — " + filename, "ok");
+  logLine2("MCADDON READY: " + filename, "ok");
   updateDebug();
   return { bytes: mcaddonBytes, filename };
 }
@@ -1400,6 +1478,7 @@ function closeDrawer(){
 function wire(){
   initTheme();
   refreshNetStatus();
+  renderScriptDocs();
 
   $$("[data-nav]").forEach(b => b.addEventListener("click", () => goNav(b.dataset.nav)));
   $("#btn-open-drawer").addEventListener("click", openDrawer);
