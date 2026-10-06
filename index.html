@@ -318,6 +318,11 @@ footer{padding:28px 24px 100px;color:var(--muted);font-size:12px;font-family:var
 }
 .btn-load.loading::after{display:none;}
 @keyframes stripes{to{background-position:34px 0}}
+/* ---- no sideways scrolling on phones ---- */
+html,body{max-width:100%;overflow-x:hidden;overscroll-behavior-x:none;}
+.shell,.main-col{max-width:100%;overflow-x:clip;}
+.drawer{visibility:hidden;transition:transform .22s ease,visibility 0s linear .22s;}
+.drawer.open{visibility:visible;transition:transform .22s ease,visibility 0s;}
 [hidden]{display:none!important;}
 </style>
 </head>
