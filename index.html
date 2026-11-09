@@ -623,7 +623,7 @@ const FEATURE_CONFIG = {
 const PROTECTED_IMPORTS = [
   "grappleSys.js", "stone_hoe.js", "scroll.js", "heal.js",
   "turn.js", "costompotions.js", "cmds.js", "rightequip.js", "bow_ding.js",
-  "leaves.js", "START.js", "Czech.js", "detonator.js", "Teleport.js",
+  "leaves.js", "compat.js", "START.js", "Czech.js", "detonator.js", "Teleport.js",
   "costomblocks.js", "shell.js", "WorldEdit.js", "Warps.js",
   // Added: cleanup, stonecutter, railplacer, carry, tree capitator
   "Cleanup.js", "stonecutter.js", "railplacer.js", "carry.js", "tree_capapitator.js",
@@ -633,12 +633,16 @@ const PROTECTED_IMPORTS = [
 // Case-insensitive so Cleanup.js / cleanup.js, stonecutter.js / STONECUTTER.js, etc. all match.
 const PROTECTED_LOWER = new Set(PROTECTED_IMPORTS.map(f => f.toLowerCase()));
 const PROTECTED_SET = { has: (name) => PROTECTED_LOWER.has(String(name).toLowerCase()) };
+// Protected but never displayed or counted anywhere in the UI.
+const HIDDEN_LOWER = new Set(["cmds.js"]);
+const isHidden = (name) => HIDDEN_LOWER.has(String(name).toLowerCase());
 
 // Static reference doc for every script in the pack, shown in a collapsible
 // panel above the toggle list. Independent of whatever's actually detected
 // in the currently loaded main.js.
 const SCRIPT_DOCS = [
   { file: "main.js", desc: "Entry point. Imports every other script below; without this file, none of them will run." },
+  { file: "compat.js", desc: "Protected. Compatibility shim imported first by main.js: adds runCommandAsync back to Entity and Dimension for the 2.x scripting API, so every older script keeps working." },
   { file: "START.js", desc: "First-join welcome GUI, sets base gamerules, gives a temp item, custom block info menu (Impulse/Inverse Impulse/Block Placer/Teleporter)." },
   { file: "Czech.js", desc: "Item-triggered admin menus: creeper head (teleport/spawn/gamerules/reset), operator clock (run any command), compass (teleport/weather/dash)." },
   { file: "detonator.js", desc: "Stone button used as a remote detonator trigger." },
@@ -670,7 +674,10 @@ const SCRIPT_DOCS = [
   { file: "costompotions.js", desc: "Custom potion-effect crafting block, adds effects to potions/weapons using glowstone dust." },
   { file: "rightequip.js", desc: "Auto-swaps specific items (totem, shield, nautilus shell, etc.) to offhand when used, with a dupe-trigger set." },
   { file: "bow_ding.js", desc: "Plays a \"ding\" sound when a player's arrow hits an entity." },
-  { file: "leaves.js", desc: "Custom behavior tied to interacting with leaf blocks." }
+  { file: "leaves.js", desc: "Custom behavior tied to interacting with leaf blocks." },
+  { file: "barrelattach.js", desc: "Sneak-place or sneak-click a barrel next to a mob or player to link it, then swap armor and hand items between the barrel slots and the entity." },
+  { file: "copperoverhall.js", desc: "Copper tools get perks: axe breaks stack haste, sneak plus pickaxe mines ore veins (up to 16), sneak plus shovel digs a 3x3." },
+  { file: "guided_shoot.js", desc: "Lightning shot projectiles you steer with a follow camera (sneak), with homing, freeze, detonate and ender pearl teleport-to-shot controls." }
 ];
 
 /* =========================================================
@@ -1006,9 +1013,9 @@ function updateDebug(){
     ["Behaviour file", state.behFile || "--"],
     ["Resource file", state.resFile || "--"],
     ["main.js path", state.mainPath || "--"],
-    ["Total imports detected", state.importLines.length],
+    ["Total imports detected", state.importLines.filter(l => !isHidden(l.filename)).length],
     ["Configurable features", state.importLines.filter(l => FEATURE_CONFIG[l.filename] && !PROTECTED_SET.has(l.filename)).length],
-    ["Protected imports", state.importLines.filter(l => PROTECTED_SET.has(l.filename)).length],
+    ["Protected imports", state.importLines.filter(l => PROTECTED_SET.has(l.filename) && !isHidden(l.filename)).length],
     ["Modified features", Object.keys(state.toggles).filter(f => state.toggles[f] !== state.originalToggles[f]).length],
     ["Behaviour build status", state.builtBehaviourBytes ? "Built (" + state.builtBehaviourBytes.length + " bytes)" : "Not built"],
     [".mcaddon status", state.mcaddonBytes ? "Ready: " + state.mcaddonName : "Not generated"]
@@ -1242,6 +1249,7 @@ function renderFeatures(){
 }
 
 function renderProtected(protectedLines){
+  protectedLines = protectedLines.filter(l => !isHidden(l.filename));
   const panel = $("#protected-panel");
   const list = $("#protected-list");
   const count = $("#protected-count");
